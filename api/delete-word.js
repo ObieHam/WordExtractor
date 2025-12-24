@@ -1,5 +1,10 @@
-import { sql } from '@vercel/postgres';
+import postgres from 'postgres';
 import { del } from '@vercel/blob';
+
+const sql = postgres(process.env.DATABASE_URL, { 
+  ssl: 'require',
+  max: 1 
+});
 
 export default async function handler(req, res) {
   if (req.method !== 'DELETE') {
@@ -14,7 +19,7 @@ export default async function handler(req, res) {
 
   try {
     // Get media URLs before deleting
-    const { rows } = await sql`
+    const rows = await sql`
       SELECT user_image_url, user_audio_url 
       FROM words 
       WHERE word = ${word}
